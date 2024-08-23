@@ -12,13 +12,28 @@ if [ ! -d "$SYMLINK_DIR" ]; then
 fi
 
 # Prompt the user for the full path to the network switch script
-read -p "📂 Enter the full path to your network switch script (e.g., /usr/local/bin/lanlord.sh): " SCRIPT_PATH
+read -p "📂 Enter the full path to your network switch script (e.g., /Users/myuser/folder/lanlord/lanlord.sh): " SCRIPT_PATH
 
 # Verify if the script path exists
 if [ ! -f "$SCRIPT_PATH" ]; then
     echo "❌ Error: The script path you provided does not exist. Please check the path and try again."
     exit 1
 fi
+
+# Prompt the user for the Ethernet interface name
+read -p "🔌 Enter the Ethernet interface name (e.g., en0): " ETHERNET_INTERFACE
+
+# Prompt the user for the Wi-Fi interface name
+read -p "📶 Enter the Wi-Fi interface name (e.g., en1): " WIFI_INTERFACE
+
+# Update the network switch script with the provided interfaces
+echo "✏️ Updating the network switch script with interface names..."
+TEMPLATE_DAEMON="./lanlord.sh"
+sudo sed \
+    -e "s|{{DAEMON_NAME}}|${DAEMON_NAME}|g" \
+    -e "s|{{SCRIPT_PATH}}|${SYMLINK_PATH}|g" \
+    -e "s|{{INTERVAL}}|${INTERVAL}|g" \
+    "$TEMPLATE_DAEMON" | sudo tee "$TEMPLATE_DAEMON" > /dev/null
 
 # Symlink the script to the specified directory
 SYMLINK_PATH="${SYMLINK_DIR}/lanlord.sh"
